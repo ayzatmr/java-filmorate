@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.util.Collections;
@@ -37,10 +38,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, List<String>>> handleNotFoundException(ValidationException ex) {
+    public ResponseEntity<Map<String, List<String>>> handleValidationException(ValidationException ex) {
         List<String> errors = Collections.singletonList(ex.getMessage());
         log.info(errors.toString());
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ResponseEntity<Map<String, List<String>>> handleNotFoundException(ObjectNotFoundException ex) {
+        List<String> errors = Collections.singletonList(ex.getMessage());
+        log.info(errors.toString());
+        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.Matchers.containsString;
@@ -37,15 +35,25 @@ public class UserControllerTest {
 
     @Test
     public void checkGetAllUsers() throws Exception {
-        String contentAsString = this.mockMvc.perform(get("/users"))
+        User user = User.builder()
+                .id(uniqueId.incrementAndGet())
+                .name("Rayan Buc")
+                .email("test@mail.ru")
+                .birthday(LocalDate.of(1991, 11, 11))
+                .login("test")
+                .build();
+        String json = objectMapper.writeValueAsString(user);
+
+        this.mockMvc
+                .perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json));
+
+        this.mockMvc.perform(get("/users"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        List<User> response = objectMapper.readValue(contentAsString, new TypeReference<List<User>>() {
-        });
-        assertNotNull(response, "all users are returned");
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Rayan Buc")));
     }
 
     @Test
@@ -77,7 +85,6 @@ public class UserControllerTest {
     public void createUserWithEmptyNameShouldBeValid() throws Exception {
         User user = User.builder()
                 .id(uniqueId.incrementAndGet())
-                .name("")
                 .email("test@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test")
@@ -117,7 +124,7 @@ public class UserControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().string(containsString("email should be valid")))
                 .andExpect(content().string(containsString("login should not contain spaces and special chars")))
-                .andExpect(content().string(containsString("birthday can not be in the past")));
+                .andExpect(content().string(containsString("birthday can not be in the future")));
     }
 
     @Test
@@ -164,7 +171,27 @@ public class UserControllerTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(content().string(containsString("email should be valid")))
                 .andExpect(content().string(containsString("login should not contain spaces and special chars")))
-                .andExpect(content().string(containsString("birthday can not be in the past")));
+                .andExpect(content().string(containsString("birthday can not be in the future")));
+    }
+
+    @Test
+    public void updateUserNotFoundException() throws Exception {
+        User user = User.builder()
+                .id(99999)
+                .name("Rayan")
+                .email("test@mail.ru")
+                .birthday(LocalDate.of(1991, 11, 11))
+                .login("test")
+                .build();
+        String json = objectMapper.writeValueAsString(user);
+
+        this.mockMvc
+                .perform(put("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is4xxClientError())
+                .andExpect(content().string(containsString("User not found")));
     }
 }
 

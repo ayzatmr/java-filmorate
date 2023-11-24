@@ -25,6 +25,6 @@ public class User {
 
     private String name;
 
-    @Past(message = "birthday can not be in the past")
+    @Past(message = "birthday can not be in the future")
     private LocalDate birthday;
 }

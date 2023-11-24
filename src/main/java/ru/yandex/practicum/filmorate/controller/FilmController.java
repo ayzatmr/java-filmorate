@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/films")
@@ -18,6 +20,7 @@ import java.util.Map;
 public class FilmController {
     private static final Map<Integer, Film> films = new HashMap<>();
     private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
+    private final AtomicInteger uniqueId = new AtomicInteger();
 
     @GetMapping
     public List<Film> findAll() {
@@ -29,6 +32,7 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(MAX_DATE)) {
             throw new ValidationException("date can not be more than " + MAX_DATE.toString());
         }
+        film.setId(uniqueId.incrementAndGet());
         log.debug("add new film: {}", film);
         films.put(film.getId(), film);
         return film;
@@ -40,7 +44,11 @@ public class FilmController {
             throw new ValidationException("date can not be more than " + MAX_DATE.toString());
         }
         log.debug("update film: {}", film);
-        films.put(film.getId(), film);
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
+        } else {
+            throw new ObjectNotFoundException("Film not found");
+        }
         return film;
     }
 }
