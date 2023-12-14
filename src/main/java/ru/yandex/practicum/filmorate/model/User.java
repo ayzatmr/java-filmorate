@@ -9,6 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -27,4 +28,6 @@ public class User {
 
     @Past(message = "birthday can not be in the future")
     private LocalDate birthday;
+
+    private Set<Long> friends;
 }

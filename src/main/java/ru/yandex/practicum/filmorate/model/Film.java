@@ -26,4 +26,6 @@ public class Film {
     @Positive(message = "select positive duration in seconds only")
     private int duration; // in seconds
 
+    private int likes;
+
 }
