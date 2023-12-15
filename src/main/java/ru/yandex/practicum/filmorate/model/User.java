@@ -9,6 +9,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -29,5 +31,19 @@ public class User {
     @Past(message = "birthday can not be in the future")
     private LocalDate birthday;
 
-    private Set<Long> friends;
+    private Set<Integer> friends;
+
+    public Set<Integer> getFriends() {
+        return Objects.requireNonNullElseGet(friends, HashSet::new);
+    }
+
+    public void addNewFriend(int userId) {
+        Set<Integer> friends = getFriends();
+        friends.add(userId);
+    }
+
+    public void deleteFriend(int userId) {
+        Set<Integer> friends = getFriends();
+        friends.remove(userId);
+    }
 }

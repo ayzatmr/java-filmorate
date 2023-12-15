@@ -47,4 +47,33 @@ public class UserService {
         }
         return user;
     }
+
+    public User addFriend(int userId, int friendId) {
+        log.debug("add friend with id = {} to user with id = {}", friendId, userId);
+        User user = userStorage.addFriend(userId, friendId);
+        if (user == null) {
+            throw new ObjectNotFoundException("User not found");
+        }
+        return user;
+    }
+
+    public void deleteFriend(int userId, int friendId) {
+        userStorage.deleteFriend(userId, friendId);
+    }
+
+    public List<User> getFriends(int userId) {
+        List<User> friends = userStorage.getFriends(userId);
+        if (friends == null) {
+            throw new ObjectNotFoundException("User not found");
+        }
+        return friends;
+    }
+
+    public List<User> getCommonFriends(int userId, int otherId) {
+        List<User> commonFriends = userStorage.getCommonFriends(userId, otherId);
+        if (commonFriends == null) {
+            throw new ObjectNotFoundException("User not found");
+        }
+        return commonFriends;
+    }
 }

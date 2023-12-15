@@ -17,7 +17,6 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
 
-
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
@@ -54,5 +53,30 @@ public class FilmService {
         } else {
             return film;
         }
+    }
+
+    public Film addLike(int filmId, int userId) {
+        log.debug("add like by userId = {} to film with id = {}", userId, filmId);
+        Film film = filmStorage.addLike(filmId, userId);
+        if (film == null) {
+            throw new ObjectNotFoundException("Wrong film or userId is provided");
+        }
+        return film;
+    }
+
+    public void deleteLike(int filmId, int userId) {
+        log.debug("delete like by userId = {} from film with id = {}", userId, filmId);
+        Film film = filmStorage.deleteLike(filmId, userId);
+        if (film == null) {
+            throw new ObjectNotFoundException("Wrong film or userId is presented");
+        }
+    }
+
+    public List<Film> getPopularFilms(int count) {
+        log.debug("Get popular films with limit = {}", count);
+        if (count <= 0) {
+            throw new ValidationException("count should be greater than 0");
+        }
+        return filmStorage.getPopularFilms(count);
     }
 }

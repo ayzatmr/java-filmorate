@@ -5,9 +5,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
@@ -35,6 +37,20 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
         log.info(getErrorsMap(errors).toString());
         return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentTypeMismatchException ex) {
+        List<String> errors = Collections.singletonList(ex.getMessage());
+        log.info(errors.toString());
+        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Map<String, List<String>>> handleNotSupportedMethod(HttpRequestMethodNotSupportedException ex) {
+        List<String> errors = Collections.singletonList(ex.getMessage());
+        log.info(errors.toString());
+        return new ResponseEntity<>(getErrorsMap(errors), new HttpHeaders(), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(ValidationException.class)

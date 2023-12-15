@@ -8,6 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Data
 @Builder
@@ -26,6 +29,21 @@ public class Film {
     @Positive(message = "select positive duration in seconds only")
     private int duration; // in seconds
 
+    private Set<Integer> likedUsers;
+
     private int likes;
 
+    public Set<Integer> getLikedUsers() {
+        return Objects.requireNonNullElseGet(likedUsers, HashSet::new);
+    }
+
+    public void addLikedUser(int userId) {
+        Set<Integer> likedUsers = getLikedUsers();
+        likedUsers.add(userId);
+    }
+
+    public void deleteLikedUser(int userId) {
+        Set<Integer> likedUsers = getLikedUsers();
+        likedUsers.remove(userId);
+    }
 }
