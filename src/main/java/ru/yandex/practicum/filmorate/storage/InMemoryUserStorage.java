@@ -47,7 +47,7 @@ public class InMemoryUserStorage implements UserStorage {
         User currentUser = users.get(userId);
         User friend = users.get(friendId);
         if (currentUser != null && friend != null) {
-            currentUser.getFriends().add(friendId);
+            currentUser.addNewFriend(friendId);
             friend.addNewFriend(userId);
             return currentUser;
         }

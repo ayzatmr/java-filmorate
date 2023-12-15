@@ -40,10 +40,12 @@ public class User {
     public void addNewFriend(int userId) {
         Set<Integer> friends = getFriends();
         friends.add(userId);
+        this.friends = friends;
     }
 
     public void deleteFriend(int userId) {
         Set<Integer> friends = getFriends();
         friends.remove(userId);
+        this.friends = friends;
     }
 }

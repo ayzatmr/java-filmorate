@@ -40,10 +40,12 @@ public class Film {
     public void addLikedUser(int userId) {
         Set<Integer> likedUsers = getLikedUsers();
         likedUsers.add(userId);
+        this.likedUsers = likedUsers;
     }
 
     public void deleteLikedUser(int userId) {
         Set<Integer> likedUsers = getLikedUsers();
         likedUsers.remove(userId);
+        this.likedUsers = likedUsers;
     }
 }
