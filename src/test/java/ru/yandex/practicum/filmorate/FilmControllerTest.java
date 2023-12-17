@@ -210,7 +210,7 @@ public class FilmControllerTest {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
-                .andExpect(content().string(containsString("Film not found")));
+                .andExpect(content().string(containsString("Film is not found")));
     }
 
     @Test

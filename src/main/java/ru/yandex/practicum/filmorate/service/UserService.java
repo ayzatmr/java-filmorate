@@ -1,60 +1,53 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public List<User> findAllUsers() {
         return userStorage.findAllUsers();
     }
 
-    public User getUser(int userId) {
-        User user = userStorage.getUser(userId);
-        if (user == null) {
-            throw new ObjectNotFoundException("User not found");
+    private void checkUserName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
-        return user;
+    }
+
+    public User getUser(int userId) {
+        return Optional.ofNullable(userStorage.getUser(userId))
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public User addUser(User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        checkUserName(user);
         log.debug("add new user: {}", user);
         return userStorage.addUser(user);
     }
 
     public User updateUser(User user) {
+        checkUserName(user);
         log.debug("update user: {}", user);
-        User newUser = userStorage.updateUser(user);
-        if (newUser == null) {
-            throw new ObjectNotFoundException("User not found");
-        }
-        return user;
+        return Optional.ofNullable(userStorage.updateUser(user))
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public User addFriend(int userId, int friendId) {
         log.debug("add friend with id = {} to user with id = {}", friendId, userId);
-        User user = userStorage.addFriend(userId, friendId);
-        if (user == null) {
-            throw new ObjectNotFoundException("User not found");
-        }
-        return user;
+        return Optional.ofNullable(userStorage.addFriend(userId, friendId))
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public void deleteFriend(int userId, int friendId) {
@@ -62,18 +55,12 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
-        List<User> friends = userStorage.getFriends(userId);
-        if (friends == null) {
-            throw new ObjectNotFoundException("User not found");
-        }
-        return friends;
+        return Optional.ofNullable(userStorage.getFriends(userId))
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public List<User> getCommonFriends(int userId, int otherId) {
-        List<User> commonFriends = userStorage.getCommonFriends(userId, otherId);
-        if (commonFriends == null) {
-            throw new ObjectNotFoundException("User not found");
-        }
-        return commonFriends;
+        return Optional.ofNullable(userStorage.getCommonFriends(userId, otherId))
+                .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 }
