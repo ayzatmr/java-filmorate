@@ -7,16 +7,18 @@ import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+
     private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
 
     private void checkFilmMaxDate(Film film) {
@@ -30,7 +32,7 @@ public class FilmService {
     }
 
     public Film getFilm(int filmId) {
-        return Optional.ofNullable(filmStorage.getFilm(filmId))
+        return filmStorage.getFilm(filmId)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 
@@ -43,19 +45,25 @@ public class FilmService {
     public Film updateFilm(Film film) {
         checkFilmMaxDate(film);
         log.debug("update film: {}", film);
-        return Optional.ofNullable(filmStorage.updateFilm(film))
+        return filmStorage.updateFilm(film)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 
     public Film addLike(int filmId, int userId) {
         log.debug("add like by userId = {} to film with id = {}", userId, filmId);
-        return Optional.ofNullable(filmStorage.addLike(filmId, userId))
+        if (userStorage.getUser(userId).isEmpty()) {
+            throw new ObjectNotFoundException("User not found");
+        }
+        return filmStorage.addLike(filmId, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Wrong film or userId is provided"));
     }
 
     public void deleteLike(int filmId, int userId) {
         log.debug("delete like by userId = {} from film with id = {}", userId, filmId);
-        Optional.ofNullable(filmStorage.deleteLike(filmId, userId))
+        if (userStorage.getUser(userId).isEmpty()) {
+            throw new ObjectNotFoundException("User not found");
+        }
+        filmStorage.deleteLike(filmId, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Wrong film or userId is presented"));
     }
 

@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.Matchers.containsString;
@@ -244,7 +243,7 @@ public class UserControllerTest {
         for (int i = 0; i < 2; i++) {
             User user = User.builder()
                     .name("tommy")
-                    .email("test" + uniqueId.get() + "@mail.ru")
+                    .email("test" + uniqueId.incrementAndGet() + "@mail.ru")
                     .birthday(LocalDate.of(1991, 11, 11))
                     .login("test" + uniqueId.get())
                     .build();
@@ -262,27 +261,21 @@ public class UserControllerTest {
             users.add(user);
         }
 
-        String firstUser = this.mockMvc.perform(put("/users/{userId}/friends/{friendId}",
+        this.mockMvc.perform(put("/users/{userId}/friends/{friendId}",
                 users.getFirst().getId(), users.getLast().getId()))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andExpect(status().isOk());
 
-        User response = objectMapper.readValue(firstUser, User.class);
-
-        String user2 = this.mockMvc.perform(get("/users/{userId}", users.getLast().getId()))
+        String contentAsString = this.mockMvc.perform(get("/users/{userId}/friends", users.getFirst().getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        User response2 = objectMapper.readValue(user2, User.class);
+        List<User> friends = objectMapper.readValue(contentAsString, new TypeReference<>() {
+        });
 
-        assertNotNull(response, "first user is updated");
-        assertEquals(Set.of(users.getFirst().getId()), response2.getFriends(), "friend is added for 1 user");
-        assertEquals(Set.of(users.getLast().getId()), response.getFriends(), "friend is added for 2 user");
+        assertEquals(users.getLast().getId(), friends.get(0).getId(), "user2 is friend of user1");
     }
 
     @Test
@@ -323,24 +316,26 @@ public class UserControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        String user1 = this.mockMvc.perform(get("/users/{userId}", users.getFirst().getId()))
+        String user1 = this.mockMvc.perform(get("/users/{userId}/friends", users.getFirst().getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        User response = objectMapper.readValue(user1, User.class);
+        List<User> friends = objectMapper.readValue(user1, new TypeReference<>() {
+        });
 
-        String user2 = this.mockMvc.perform(get("/users/{userId}", users.getLast().getId()))
+        assertEquals(Collections.emptyList(), friends, "friend is deleted for 1 user");
+
+        String user2 = this.mockMvc.perform(get("/users/{userId}/friends", users.getFirst().getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        User response2 = objectMapper.readValue(user2, User.class);
-
-        assertEquals(Collections.emptySet(), response.getFriends(), "friend is deleted for 1 user");
-        assertEquals(Collections.emptySet(), response2.getFriends(), "friend is deleted for 2 user");
+        List<User> friends2 = objectMapper.readValue(user2, new TypeReference<>() {
+        });
+        assertEquals(Collections.emptyList(), friends2, "friend is deleted for 2 user");
     }
 
     @Test

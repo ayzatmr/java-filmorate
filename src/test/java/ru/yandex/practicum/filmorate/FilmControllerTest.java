@@ -19,15 +19,15 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import static org.hamcrest.Matchers.*;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -53,6 +53,14 @@ public class FilmControllerTest {
     @BeforeEach
     public void beforeEach() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
+    }
+
+    private Set<Integer> getRandomSet(int limit) {
+        return new Random().ints(1, 101)
+                .distinct()
+                .limit(limit)
+                .boxed()
+                .collect(Collectors.toSet());
     }
 
     @BeforeAll
@@ -275,16 +283,10 @@ public class FilmControllerTest {
 
         film = objectMapper.readValue(createdFilm, Film.class);
 
-        String contentAsString = this.mockMvc.perform(put("/films/{filmId}/like/{userId}", film.getId(), user.getId()))
+        this.mockMvc.perform(put("/films/{filmId}/like/{userId}", film.getId(), user.getId()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        Film updatedFilm = objectMapper.readValue(contentAsString, Film.class);
-        assertNotNull(updatedFilm, "liked is added");
-        assertEquals(1, updatedFilm.getLikes(), "amount of likes is correct");
-        assertTrue(updatedFilm.getLikedUsers().contains(user.getId()), "user is added to liked users");
+                .andExpect(jsonPath("$.likes", is(1)));
     }
 
     @Test
@@ -303,7 +305,6 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .likedUsers(Collections.singleton(1))
-                .likes(1)
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -344,7 +345,7 @@ public class FilmControllerTest {
                     .description("Good film")
                     .duration(2)
                     .releaseDate(LocalDate.of(2000, 1, 1))
-                    .likes(i)
+                    .likedUsers(getRandomSet(i))
                     .build();
             String json = objectMapper.writeValueAsString(film);
 

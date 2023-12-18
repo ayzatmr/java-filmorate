@@ -1,15 +1,16 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -22,6 +23,7 @@ public class Film {
     private String name;
 
     @Size(max = 200, message = "max description size is 200")
+    @NotNull
     private String description;
 
     private LocalDate releaseDate;
@@ -29,23 +31,11 @@ public class Film {
     @Positive(message = "select positive duration in seconds only")
     private int duration; // in seconds
 
-    private Set<Integer> likedUsers;
+    @JsonIgnore
+    @Builder.Default
+    private Set<Integer> likedUsers = new HashSet<>();
 
-    private int likes;
-
-    public Set<Integer> getLikedUsers() {
-        return Objects.requireNonNullElseGet(likedUsers, HashSet::new);
-    }
-
-    public void addLikedUser(int userId) {
-        Set<Integer> likedUsers = getLikedUsers();
-        likedUsers.add(userId);
-        this.likedUsers = likedUsers;
-    }
-
-    public void deleteLikedUser(int userId) {
-        Set<Integer> likedUsers = getLikedUsers();
-        likedUsers.remove(userId);
-        this.likedUsers = likedUsers;
+    public int getLikes() {
+        return likedUsers.size();
     }
 }

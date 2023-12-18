@@ -1,35 +1,24 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class InMemoryFilmStorage implements FilmStorage {
-    private static final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, Film> films = new HashMap<>();
     private final AtomicInteger uniqueId = new AtomicInteger();
-    private final UserStorage userStorage;
-
-    private User getUser(int userId) {
-        return userStorage.findAllUsers().stream()
-                .filter(u -> u.getId() == userId)
-                .findAny()
-                .orElse(null);
-    }
 
     @Override
     public List<Film> findAllFilms() {
         return new ArrayList<>(films.values());
     }
 
-    public Film getFilm(int filmId) {
-        return films.get(filmId);
+    public Optional<Film> getFilm(int filmId) {
+        return Optional.ofNullable(films.get(filmId));
     }
 
     @Override
@@ -40,37 +29,27 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
-        if (films.containsKey(film.getId())) {
+    public Optional<Film> updateFilm(Film film) {
+        Optional<Film> currentFilm = getFilm(film.getId());
+        if (currentFilm.isPresent()) {
             films.put(film.getId(), film);
-            return film;
-        } else {
-            return null;
+            return Optional.of(film);
         }
+        return currentFilm;
     }
 
     @Override
-    public Film addLike(int filmId, int userId) {
-        User user = getUser(userId);
-        Film film = films.get(filmId);
-        if (user != null && film != null) {
-            film.setLikes(film.getLikes() + 1);
-            film.addLikedUser(userId);
-            return film;
-        }
-        return null;
+    public Optional<Film> addLike(int filmId, int userId) {
+        Optional<Film> film = getFilm(filmId);
+        film.ifPresent(f -> f.getLikedUsers().add(userId));
+        return film;
     }
 
     @Override
-    public Film deleteLike(int filmId, int userId) {
-        User user = getUser(userId);
-        Film film = films.get(filmId);
-        if (user != null && film != null) {
-            film.setLikes(film.getLikes() - 1);
-            film.deleteLikedUser(userId);
-            return film;
-        }
-        return null;
+    public Optional<Film> deleteLike(int filmId, int userId) {
+        Optional<Film> film = getFilm(filmId);
+        film.ifPresent(f -> f.getLikedUsers().remove(userId));
+        return film;
     }
 
     @Override

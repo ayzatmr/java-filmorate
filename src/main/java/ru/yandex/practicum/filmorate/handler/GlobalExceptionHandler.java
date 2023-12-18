@@ -32,17 +32,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(errors);
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, ConstraintViolationException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationErrors(MethodArgumentTypeMismatchException ex) {
-        List<String> errors = Collections.singletonList(ex.getMessage());
-        log.info(errors.toString());
-        return new ErrorResponse(errors);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationErrors(ConstraintViolationException ex) {
+    public ErrorResponse handleValidationErrors(RuntimeException ex) {
         List<String> errors = Collections.singletonList(ex.getMessage());
         log.info(errors.toString());
         return new ErrorResponse(errors);
@@ -51,14 +43,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ErrorResponse handleNotSupportedMethod(HttpRequestMethodNotSupportedException ex) {
-        List<String> errors = Collections.singletonList(ex.getMessage());
-        log.info(errors.toString());
-        return new ErrorResponse(errors);
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(ValidationException ex) {
         List<String> errors = Collections.singletonList(ex.getMessage());
         log.info(errors.toString());
         return new ErrorResponse(errors);

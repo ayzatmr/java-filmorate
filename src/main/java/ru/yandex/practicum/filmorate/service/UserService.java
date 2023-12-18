@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -27,7 +26,7 @@ public class UserService {
     }
 
     public User getUser(int userId) {
-        return Optional.ofNullable(userStorage.getUser(userId))
+        return userStorage.getUser(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
@@ -40,13 +39,13 @@ public class UserService {
     public User updateUser(User user) {
         checkUserName(user);
         log.debug("update user: {}", user);
-        return Optional.ofNullable(userStorage.updateUser(user))
+        return userStorage.updateUser(user)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public User addFriend(int userId, int friendId) {
         log.debug("add friend with id = {} to user with id = {}", friendId, userId);
-        return Optional.ofNullable(userStorage.addFriend(userId, friendId))
+        return userStorage.addFriend(userId, friendId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
@@ -55,12 +54,12 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
-        return Optional.ofNullable(userStorage.getFriends(userId))
+        return userStorage.getFriends(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
     public List<User> getCommonFriends(int userId, int otherId) {
-        return Optional.ofNullable(userStorage.getCommonFriends(userId, otherId))
+        return userStorage.getCommonFriends(userId, otherId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 }
