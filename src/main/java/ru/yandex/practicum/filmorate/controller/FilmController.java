@@ -1,54 +1,57 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @RequestMapping("/films")
-@Slf4j
+@Validated
+@RequiredArgsConstructor
 public class FilmController {
-    private static final Map<Integer, Film> films = new HashMap<>();
-    private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
-    private final AtomicInteger uniqueId = new AtomicInteger();
+
+    private final FilmService filmService;
 
     @GetMapping
-    public List<Film> findAll() {
-        return new ArrayList<>(films.values());
+    public List<Film> findAllFilms() {
+        return filmService.findAllFilms();
+    }
+
+    @GetMapping("/{filmId}")
+    public Film getFilm(@PathVariable int filmId) {
+        return filmService.getFilm(filmId);
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(MAX_DATE)) {
-            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
-        }
-        film.setId(uniqueId.incrementAndGet());
-        log.debug("add new film: {}", film);
-        films.put(film.getId(), film);
-        return film;
+        return filmService.addFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (film.getReleaseDate().isBefore(MAX_DATE)) {
-            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
-        }
-        log.debug("update film: {}", film);
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-        } else {
-            throw new ObjectNotFoundException("Film not found");
-        }
-        return film;
+        return filmService.updateFilm(film);
+    }
+
+    @PutMapping("{filmId}/like/{userId}")
+    public Film addLike(@PathVariable int filmId, @PathVariable int userId) {
+        return filmService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping("{filmId}/like/{userId}")
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    public void deleteLike(@PathVariable int filmId, @PathVariable int userId) {
+        filmService.deleteLike(filmId, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@Positive @RequestParam(defaultValue = "10") int count) {
+        return filmService.getPopularFilms(count);
     }
 }
