@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -75,5 +77,27 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         log.debug("Get popular films with limit = {}", count);
         return filmDao.getPopularFilms(count);
+    }
+
+    public List<Rating> getAllRatings() {
+        log.debug("get all available ratings");
+        return filmDao.getAllRatings();
+    }
+
+    public Rating getRatingById(int ratingId) {
+        log.debug("get rating with id = {}", ratingId);
+        return filmDao.getRating(ratingId)
+                .orElseThrow(() -> new ObjectNotFoundException("Rating is not found"));
+    }
+
+    public List<Genre> getAllGenres() {
+        log.debug("get all available genres");
+        return filmDao.getAllGenres();
+    }
+
+    public Genre getGenreById(int genreId) {
+        log.debug("get genre with id = {}", genreId);
+        return filmDao.getGenre(genreId)
+                .orElseThrow(() -> new ObjectNotFoundException("Genre is not found"));
     }
 }
