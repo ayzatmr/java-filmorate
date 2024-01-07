@@ -72,7 +72,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Genre> getAllGenres() {
-        String sqlQuery = "select * from GENRES";
+        String sqlQuery = "select * from GENRES order by ID";
         return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class));
     }
 
@@ -89,7 +89,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Rating> getAllRatings() {
-        String sqlQuery = "select * from RATINGS";
+        String sqlQuery = "select * from RATINGS order by ID";
         return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Rating.class));
     }
 
@@ -175,7 +175,7 @@ public class FilmDaoImpl implements FilmDao {
 
     @Override
     public List<Film> getPopularFilms(int count) {
-        String sqlQuery = "select f.*, r.NAME from FILMS f join RATINGS R on f.RATING_ID = R.ID left join likes l on f.ID = l.FILM_ID group by f.id order by count(l.*) desc limit ?;";
+        String sqlQuery = "with q as (select count(*) as cnt, FILM_ID from LIKES group by FILM_ID) select f.*, r.NAME, q.cnt from FILMS f join RATINGS R on f.RATING_ID = R.ID left join q on f.ID = q.FILM_ID order by q.cnt desc limit ?;";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 }

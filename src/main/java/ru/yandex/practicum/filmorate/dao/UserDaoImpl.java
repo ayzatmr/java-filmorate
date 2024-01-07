@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -39,16 +38,6 @@ public class UserDaoImpl implements UserDao {
                 .build();
     }
 
-    private Optional<User> getUserByLogin(String login) {
-        String sqlQuery = "select * from USERS where login = ?;";
-        try {
-            User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, login);
-            return Optional.ofNullable(user);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
     @Override
     public List<User> findAllUsers() {
         String sqlQuery = "select * from USERS;";
@@ -68,10 +57,6 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User addUser(User user) {
-        Optional<User> userByLogin = getUserByLogin(user.getLogin());
-        if (userByLogin.isPresent()) {
-            throw new ValidationException("Login is reserved by another user");
-        }
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -82,9 +67,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> updateUser(User user) {
-        Optional<User> userByLogin = getUserByLogin(user.getLogin());
-        if (userByLogin.isPresent() && userByLogin.get().getId() != user.getId()) {
-            throw new ValidationException("Login is reserved by another user");
+        Optional<User> currentUser = getUser(user.getId());
+        if (currentUser.isEmpty()) {
+            return Optional.empty();
         }
         String sqlQuery = "update users set email = ?, login = ?, name = ?, birthday = ? where id = ?";
         jdbcTemplate.update(sqlQuery,

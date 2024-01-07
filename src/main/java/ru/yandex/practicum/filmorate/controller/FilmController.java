@@ -57,6 +57,7 @@ public class FilmController {
         return filmService.getPopularFilms(count);
     }
 
+    @RequestMapping("/")
     @GetMapping("/mpa")
     public List<Rating> getAllRatings() {
         return filmService.getAllRatings();

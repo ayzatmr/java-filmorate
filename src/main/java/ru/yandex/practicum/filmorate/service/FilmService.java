@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,6 +27,17 @@ public class FilmService {
     public FilmService(@Qualifier("FilmDaoImpl") FilmDao filmDao, @Qualifier("UserDaoImpl") UserDao userDao) {
         this.filmDao = filmDao;
         this.userDao = userDao;
+    }
+
+    private Film leftUniqueGenres(Film film) {
+        if (film.getGenres() != null) {
+            List<Genre> genres = film.getGenres()
+                    .stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+            film.setGenres(genres);
+        }
+        return film;
     }
 
     private void checkFilmMaxDate(Film film) {
@@ -45,14 +57,16 @@ public class FilmService {
 
     public Film addFilm(Film film) {
         checkFilmMaxDate(film);
-        log.debug("add new film: {}", film);
-        return filmDao.addFilm(film);
+        Film updatedFilm = leftUniqueGenres(film);
+        log.debug("add new film: {}", updatedFilm);
+        return filmDao.addFilm(updatedFilm);
     }
 
     public Film updateFilm(Film film) {
         checkFilmMaxDate(film);
-        log.debug("update film: {}", film);
-        return filmDao.updateFilm(film)
+        Film updatedFilm = leftUniqueGenres(film);
+        log.debug("update film: {}", updatedFilm);
+        return filmDao.updateFilm(updatedFilm)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 

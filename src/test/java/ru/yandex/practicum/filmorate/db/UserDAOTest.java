@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.dao.UserDaoImpl;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -80,19 +78,6 @@ class UserDAOTest {
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(newUser);
-    }
-
-    @Test
-    public void testCreateUserWithSameLogin() {
-        User newUser = User.builder()
-                .name("Rayan Buc")
-                .email("test@mail.ru")
-                .birthday(LocalDate.of(1991, 11, 11))
-                .login("test")
-                .build();
-
-        ValidationException exception = assertThrows(ValidationException.class, () -> userDao.addUser(newUser));
-        assertEquals("Login is reserved by another user", exception.getMessage());
     }
 
     @Test
