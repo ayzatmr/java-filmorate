@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.e2e;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import ru.yandex.practicum.filmorate.config.TestConfig;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -27,9 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(classes = {TestConfig.class})
 @AutoConfigureMockMvc
 public class UserControllerTest {
+
     private final AtomicInteger uniqueId = new AtomicInteger();
     private MockMvc mockMvc;
 
@@ -95,7 +97,7 @@ public class UserControllerTest {
         User user = User.builder()
                 .email("test@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
-                .login("test")
+                .login("test3")
                 .build();
         String json = objectMapper.writeValueAsString(user);
 
@@ -140,7 +142,7 @@ public class UserControllerTest {
                 .name("tommy update")
                 .email("test" + uniqueId.incrementAndGet() + "@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
-                .login("test" + uniqueId.incrementAndGet())
+                .login("test56" + uniqueId.incrementAndGet())
                 .build();
         String json = objectMapper.writeValueAsString(user);
 
@@ -198,7 +200,7 @@ public class UserControllerTest {
                 .name("Rayan")
                 .email("test@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
-                .login("test")
+                .login("test99")
                 .build();
         String json = objectMapper.writeValueAsString(user);
 
@@ -217,7 +219,7 @@ public class UserControllerTest {
                 .name("Billi Jones")
                 .email("test" + uniqueId.incrementAndGet() + "@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
-                .login("test")
+                .login("test66")
                 .build();
         String json = objectMapper.writeValueAsString(newUser);
 
@@ -245,7 +247,7 @@ public class UserControllerTest {
                     .name("tommy")
                     .email("test" + uniqueId.incrementAndGet() + "@mail.ru")
                     .birthday(LocalDate.of(1991, 11, 11))
-                    .login("test" + uniqueId.get())
+                    .login("test44" + uniqueId.get())
                     .build();
             String json = objectMapper.writeValueAsString(user);
 
@@ -287,7 +289,7 @@ public class UserControllerTest {
                     .name("tommy")
                     .email("test" + uniqueId.get() + "@mail.ru")
                     .birthday(LocalDate.of(1991, 11, 11))
-                    .login("test" + uniqueId.get())
+                    .login("test442" + uniqueId.get())
                     .build();
             String json = objectMapper.writeValueAsString(user);
 
@@ -346,7 +348,7 @@ public class UserControllerTest {
                     .name("tommy")
                     .email("test" + uniqueId.get() + "@mail.ru")
                     .birthday(LocalDate.of(1991, 11, 11))
-                    .login("test" + uniqueId.get())
+                    .login("test76" + uniqueId.get())
                     .build();
             String json = objectMapper.writeValueAsString(user);
 
@@ -388,7 +390,7 @@ public class UserControllerTest {
                     .name("tommy")
                     .email("test" + uniqueId.get() + "@mail.ru")
                     .birthday(LocalDate.of(1991, 11, 11))
-                    .login("test" + uniqueId.get())
+                    .login("test54" + uniqueId.get())
                     .build();
             String json = objectMapper.writeValueAsString(user);
 

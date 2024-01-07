@@ -4,18 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
+import org.jetbrains.annotations.Nullable;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Builder
 @Jacksonized
+
 public class Film {
     private int id;
 
@@ -35,7 +36,23 @@ public class Film {
     @Builder.Default
     private Set<Integer> likedUsers = new HashSet<>();
 
+    @Nullable
+    private List<Genre> genres;
+
+    @NotNull(message = "rating can not be null")
+    private Rating mpa;
+
     public int getLikes() {
         return likedUsers.size();
+    }
+
+    public Map<String, Object> toInsertMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("description", description);
+        map.put("release_date", releaseDate);
+        map.put("duration", duration);
+        map.put("rating_id", mpa.getId());
+        return map;
     }
 }

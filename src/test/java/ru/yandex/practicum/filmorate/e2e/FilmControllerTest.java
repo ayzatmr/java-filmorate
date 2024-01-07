@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.e2e;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,41 +14,45 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import ru.yandex.practicum.filmorate.config.TestConfig;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import static org.hamcrest.Matchers.*;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {TestConfig.class})
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class FilmControllerTest {
+
     private final AtomicInteger uniqueId = new AtomicInteger();
+
     private User user;
+
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserStorage userStorage;
 
     @BeforeEach
     public void beforeEach() {
@@ -69,11 +73,10 @@ public class FilmControllerTest {
                 .name("Rayan")
                 .email("test@mail.ru")
                 .birthday(LocalDate.of(1991, 11, 11))
-                .login("test")
+                .login("test5")
                 .build();
-        userStorage.addUser(user);
+        userService.addUser(user);
     }
-
 
     @Test
     public void getAllFilmsCheck() throws Exception {
@@ -82,6 +85,8 @@ public class FilmControllerTest {
                 .description("Good film")
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -102,6 +107,8 @@ public class FilmControllerTest {
                 .description("Best film")
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -126,6 +133,8 @@ public class FilmControllerTest {
                 .description("Best film")
                 .duration(2)
                 .releaseDate(LocalDate.of(1800, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -189,6 +198,8 @@ public class FilmControllerTest {
                 .description("Best film")
                 .duration(2)
                 .releaseDate(LocalDate.of(1800, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -209,6 +220,8 @@ public class FilmControllerTest {
                 .description("Best film")
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -228,6 +241,8 @@ public class FilmControllerTest {
                 .description("Good film")
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -270,6 +285,8 @@ public class FilmControllerTest {
                 .description("Good film")
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -305,6 +322,8 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .likedUsers(Collections.singleton(1))
+                .mpa(new Rating(1, "G"))
+                .genres(List.of(new Genre(1, "Комедия")))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -346,6 +365,8 @@ public class FilmControllerTest {
                     .duration(2)
                     .releaseDate(LocalDate.of(2000, 1, 1))
                     .likedUsers(getRandomSet(i))
+                    .mpa(new Rating(1, "G"))
+                    .genres(List.of(new Genre(1, "Комедия")))
                     .build();
             String json = objectMapper.writeValueAsString(film);
 
@@ -393,6 +414,8 @@ public class FilmControllerTest {
                     .description("Good film")
                     .duration(2)
                     .releaseDate(LocalDate.of(2000, 1, 1))
+                    .mpa(new Rating(1, "G"))
+                    .genres(List.of(new Genre(1, "Комедия")))
                     .build();
             String json = objectMapper.writeValueAsString(film);
 
