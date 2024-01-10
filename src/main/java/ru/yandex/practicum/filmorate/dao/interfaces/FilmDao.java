@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.interfaces;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -21,12 +21,4 @@ public interface FilmDao {
     List<Film> getPopularFilms(int count);
 
     Optional<Film> getFilm(int filmId);
-
-    Optional<Genre> getGenre(int genreId);
-
-    List<Genre> getAllGenres();
-
-    Optional<Rating> getRating(int ratingId);
-
-    List<Rating> getAllRatings();
 }

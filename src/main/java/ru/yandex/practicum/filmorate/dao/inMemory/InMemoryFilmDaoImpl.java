@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.dao.inMemory;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -38,26 +39,23 @@ public class InMemoryFilmDaoImpl implements FilmDao {
         return new ArrayList<>(films.values());
     }
 
+    @Override
     public Optional<Film> getFilm(int filmId) {
         return Optional.ofNullable(films.get(filmId));
     }
 
-    @Override
     public Optional<Genre> getGenre(int genreId) {
         return Optional.ofNullable(genres.get(genreId));
     }
 
-    @Override
     public List<Genre> getAllGenres() {
         return new ArrayList<>(genres.values());
     }
 
-    @Override
     public Optional<Rating> getRating(int ratingId) {
         return Optional.ofNullable(ratings.get(ratingId));
     }
 
-    @Override
     public List<Rating> getAllRatings() {
         return new ArrayList<>(ratings.values());
     }

@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -27,16 +28,6 @@ public class UserDaoImpl implements UserDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return User.builder()
-                .id(resultSet.getInt("id"))
-                .name(resultSet.getString("name"))
-                .email(resultSet.getString("email"))
-                .birthday(LocalDate.parse(resultSet.getString("birthday"), formatter))
-                .login(resultSet.getString("login"))
-                .build();
-    }
 
     @Override
     public List<User> findAllUsers() {
@@ -135,4 +126,15 @@ public class UserDaoImpl implements UserDao {
             return Optional.empty();
         }
     }
+
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+        return User.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .email(resultSet.getString("email"))
+                .birthday(LocalDate.parse(resultSet.getString("birthday"), formatter))
+                .login(resultSet.getString("login"))
+                .build();
+    }
+
 }

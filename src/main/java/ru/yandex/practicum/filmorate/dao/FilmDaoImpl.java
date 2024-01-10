@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -23,26 +24,6 @@ import java.util.Optional;
 public class FilmDaoImpl implements FilmDao {
     private final JdbcTemplate jdbcTemplate;
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        List<Genre> genres = getFilmGenres(resultSet.getInt("id"));
-        Rating mpa = new Rating(resultSet.getInt("rating_id"), resultSet.getString(7));
-
-        return Film.builder()
-                .id(resultSet.getInt("id"))
-                .name(resultSet.getString("name"))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getTimestamp("release_date").toLocalDateTime().toLocalDate())
-                .duration(resultSet.getInt("duration"))
-                .genres(genres)
-                .mpa(mpa)
-                .build();
-    }
-
-    private List<Genre> getFilmGenres(int filmId) {
-        String sqlQuery = "select g.* from GENRES g join FILM_GENRES fg on g.ID = fg.GENRE_ID where fg.FILM_ID = ?;";
-        return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class), filmId);
-    }
-
     @Override
     public List<Film> findAllFilms() {
         String sqlQuery = "select f.*, r.NAME as r_name from FILMS f join RATINGS R on f.RATING_ID = R.ID";
@@ -57,40 +38,6 @@ public class FilmDaoImpl implements FilmDao {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
-    }
-
-    @Override
-    public Optional<Genre> getGenre(int genreId) {
-        String sqlQuery = "select * from GENRES where id = ?;";
-        try {
-            Genre genre = jdbcTemplate.queryForObject(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class), genreId);
-            return Optional.ofNullable(genre);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<Genre> getAllGenres() {
-        String sqlQuery = "select * from GENRES order by ID";
-        return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class));
-    }
-
-    @Override
-    public Optional<Rating> getRating(int ratingId) {
-        String sqlQuery = "select * from RATINGS where id = ?;";
-        try {
-            Rating rating = jdbcTemplate.queryForObject(sqlQuery, BeanPropertyRowMapper.newInstance(Rating.class), ratingId);
-            return Optional.ofNullable(rating);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<Rating> getAllRatings() {
-        String sqlQuery = "select * from RATINGS order by ID";
-        return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Rating.class));
     }
 
     @Override
@@ -177,6 +124,26 @@ public class FilmDaoImpl implements FilmDao {
     public List<Film> getPopularFilms(int count) {
         String sqlQuery = "with q as (select count(*) as cnt, FILM_ID from LIKES group by FILM_ID) select f.*, r.NAME, q.cnt from FILMS f join RATINGS R on f.RATING_ID = R.ID left join q on f.ID = q.FILM_ID order by q.cnt desc limit ?;";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        List<Genre> genres = getFilmGenres(resultSet.getInt("id"));
+        Rating mpa = new Rating(resultSet.getInt("rating_id"), resultSet.getString(7));
+
+        return Film.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getTimestamp("release_date").toLocalDateTime().toLocalDate())
+                .duration(resultSet.getInt("duration"))
+                .genres(genres)
+                .mpa(mpa)
+                .build();
+    }
+
+    private List<Genre> getFilmGenres(int filmId) {
+        String sqlQuery = "select g.* from GENRES g join FILM_GENRES fg on g.ID = fg.GENRE_ID where fg.FILM_ID = ?;";
+        return jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class), filmId);
     }
 }
 

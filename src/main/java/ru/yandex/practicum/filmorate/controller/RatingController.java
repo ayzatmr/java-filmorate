@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.RatingService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -15,16 +16,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RatingController {
 
-    private final FilmService filmService;
+    private final RatingService ratingService;
 
     @GetMapping()
     public List<Rating> getAllRatings() {
-        return filmService.getAllRatings();
+        return new ArrayList<>(ratingService.getAllRatings());
     }
 
     @GetMapping("/{ratingId}")
     public Rating getRatingById(@PathVariable int ratingId) {
-        return filmService.getRatingById(ratingId);
+        return ratingService.getRatingById(ratingId);
     }
 
 }

@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.dao.FilmDaoImpl;
-import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.dao.UserDaoImpl;
+import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
+import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @JdbcTest
@@ -93,38 +94,6 @@ class FilmDAOTest {
                 hasProperty("mpa", hasProperty("id", is(film.getMpa().getId()))),
                 hasProperty("mpa", hasProperty("name", is(film.getMpa().getName()))),
                 hasProperty("genres", is(film.getGenres()))
-        ));
-    }
-
-    @Test
-    public void testGetGenreById() {
-        Genre genre = filmDao.getGenre(1).get();
-        assertEquals(1, genre.getId());
-        assertEquals("Комедия", genre.getName());
-    }
-
-    @Test
-    public void testGetAllGenres() {
-        List<Genre> genres = filmDao.getAllGenres();
-        MatcherAssert.assertThat(genres, Matchers.hasItems(
-                hasProperty("id", equalTo(1)),
-                hasProperty("name", equalTo("Комедия"))
-        ));
-    }
-
-    @Test
-    public void testGetRatingById() {
-        Rating rating = filmDao.getRating(1).get();
-        assertEquals(1, rating.getId());
-        assertEquals("G", rating.getName());
-    }
-
-    @Test
-    public void testGetAllRatings() {
-        List<Rating> ratings = filmDao.getAllRatings();
-        MatcherAssert.assertThat(ratings, Matchers.hasItems(
-                hasProperty("id", equalTo(1)),
-                hasProperty("name", equalTo("G"))
         ));
     }
 
