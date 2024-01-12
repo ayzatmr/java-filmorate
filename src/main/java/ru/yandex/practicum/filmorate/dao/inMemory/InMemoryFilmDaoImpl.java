@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.util.*;
@@ -16,15 +15,6 @@ import java.util.stream.Collectors;
 public class InMemoryFilmDaoImpl implements FilmDao {
     private final Map<Integer, Film> films = new HashMap<>();
     private final AtomicInteger uniqueId = new AtomicInteger();
-
-    private final Map<Integer, Genre> genres = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>(1, new Genre(1, "Комедия")),
-            new AbstractMap.SimpleEntry<>(2, new Genre(2, "Драма")),
-            new AbstractMap.SimpleEntry<>(3, new Genre(3, "Мультфильм")),
-            new AbstractMap.SimpleEntry<>(4, new Genre(4, "Триллер")),
-            new AbstractMap.SimpleEntry<>(5, new Genre(5, "Документальный")),
-            new AbstractMap.SimpleEntry<>(6, new Genre(6, "Боевик"))
-    );
 
     private final Map<Integer, Rating> ratings = Map.ofEntries(
             new AbstractMap.SimpleEntry<>(1, new Rating(1, "G")),
@@ -42,22 +32,6 @@ public class InMemoryFilmDaoImpl implements FilmDao {
     @Override
     public Optional<Film> getFilm(int filmId) {
         return Optional.ofNullable(films.get(filmId));
-    }
-
-    public Optional<Genre> getGenre(int genreId) {
-        return Optional.ofNullable(genres.get(genreId));
-    }
-
-    public List<Genre> getAllGenres() {
-        return new ArrayList<>(genres.values());
-    }
-
-    public Optional<Rating> getRating(int ratingId) {
-        return Optional.ofNullable(ratings.get(ratingId));
-    }
-
-    public List<Rating> getAllRatings() {
-        return new ArrayList<>(ratings.values());
     }
 
     @Override
@@ -98,5 +72,13 @@ public class InMemoryFilmDaoImpl implements FilmDao {
                 .sorted(Comparator.comparing(Film::getLikes).reversed())
                 .limit(count)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Rating> getRating(int ratingId) {
+        return Optional.ofNullable(ratings.get(ratingId));
+    }
+
+    public List<Rating> getAllRatings() {
+        return new ArrayList<>(ratings.values());
     }
 }

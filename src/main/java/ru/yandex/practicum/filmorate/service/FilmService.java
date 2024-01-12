@@ -3,13 +3,14 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
+import ru.yandex.practicum.filmorate.dao.interfaces.GenreDao;
 import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,28 +23,14 @@ public class FilmService {
 
     private final UserDao userDao;
 
+    private final GenreDao genreDao;
+
     private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
 
-    public FilmService(@Qualifier("FilmDaoImpl") FilmDao filmDao, @Qualifier("UserDaoImpl") UserDao userDao) {
+    public FilmService(@Qualifier("FilmDaoImpl") FilmDao filmDao, @Qualifier("UserDaoImpl") UserDao userDao, @Qualifier("GenreDaoImpl") GenreDao genreDao) {
         this.filmDao = filmDao;
         this.userDao = userDao;
-    }
-
-    private Film leftUniqueGenres(Film film) {
-        if (film.getGenres() != null) {
-            List<Genre> genres = film.getGenres()
-                    .stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-            film.setGenres(genres);
-        }
-        return film;
-    }
-
-    private void checkFilmMaxDate(Film film) {
-        if (film.getReleaseDate().isBefore(MAX_DATE)) {
-            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
-        }
+        this.genreDao = genreDao;
     }
 
     public List<Film> findAllFilms() {
@@ -55,19 +42,25 @@ public class FilmService {
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 
+    @Transactional
     public Film addFilm(Film film) {
         checkFilmMaxDate(film);
         Film updatedFilm = leftUniqueGenres(film);
         log.debug("add new film: {}", updatedFilm);
-        return filmDao.addFilm(updatedFilm);
+        Film addedFilm = filmDao.addFilm(updatedFilm);
+        updatedFilm.setId(addedFilm.getId());
+        return genreDao.addFilmGenre(updatedFilm);
     }
 
+    @Transactional
     public Film updateFilm(Film film) {
         checkFilmMaxDate(film);
         Film updatedFilm = leftUniqueGenres(film);
         log.debug("update film: {}", updatedFilm);
-        return filmDao.updateFilm(updatedFilm)
+        filmDao.updateFilm(updatedFilm)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
+        genreDao.deleteFilmGenre(updatedFilm);
+        return genreDao.addFilmGenre(updatedFilm);
     }
 
     public Film addLike(int filmId, int userId) {
@@ -91,5 +84,22 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         log.debug("Get popular films with limit = {}", count);
         return filmDao.getPopularFilms(count);
+    }
+
+    private Film leftUniqueGenres(Film film) {
+        if (film.getGenres() != null) {
+            List<Genre> genres = film.getGenres()
+                    .stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+            film.setGenres(genres);
+        }
+        return film;
+    }
+
+    private void checkFilmMaxDate(Film film) {
+        if (film.getReleaseDate().isBefore(MAX_DATE)) {
+            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
+        }
     }
 }

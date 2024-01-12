@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
-import org.jetbrains.annotations.Nullable;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -14,9 +13,8 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Jacksonized
-
 public class Film {
     private int id;
 
@@ -36,7 +34,6 @@ public class Film {
     @Builder.Default
     private Set<Integer> likedUsers = new HashSet<>();
 
-    @Nullable
     private List<Genre> genres;
 
     @NotNull(message = "rating can not be null")

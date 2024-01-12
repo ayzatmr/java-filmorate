@@ -21,6 +21,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,7 +76,6 @@ class FilmDAOTest {
     @Test
     public void testFindFilmById() {
         Film savedFilm = filmDao.getFilm(film.getId()).get();
-
         assertThat(savedFilm)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -106,7 +106,7 @@ class FilmDAOTest {
                 .duration(12)
                 .releaseDate(LocalDate.of(1999, 1, 1))
                 .mpa(new Rating(2, "PG"))
-                .genres(List.of(new Genre(6, "Боевик")))
+                .genres(new ArrayList<>())
                 .build();
         newFilm = filmDao.updateFilm(newFilm).get();
 
