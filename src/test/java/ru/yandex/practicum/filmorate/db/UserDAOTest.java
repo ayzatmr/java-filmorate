@@ -49,12 +49,12 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test")
                 .build();
-        user = userDao.addUser(newUser);
+        user = userDao.add(newUser);
     }
 
     @Test
     public void testFindUserById() {
-        User savedUser = userDao.getUser(user.getId()).get();
+        User savedUser = userDao.get(user.getId()).get();
 
         assertThat(savedUser)
                 .isNotNull()
@@ -72,8 +72,8 @@ class UserDAOTest {
                 .login("test2")
                 .build();
 
-        newUser = userDao.updateUser(newUser).get();
-        User userById = userDao.getUser(newUser.getId()).get();
+        newUser = userDao.update(newUser).get();
+        User userById = userDao.get(newUser.getId()).get();
         assertThat(userById)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -82,7 +82,7 @@ class UserDAOTest {
 
     @Test
     public void testFindAllUser() {
-        List<User> allUsers = userDao.findAllUsers();
+        List<User> allUsers = userDao.getAll();
         MatcherAssert.assertThat(allUsers, Matchers.hasItems(
                 hasProperty("name", is(user.getName())),
                 hasProperty("login", is(user.getLogin()))
@@ -97,7 +97,7 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test2")
                 .build();
-        friend = userDao.addUser(friend);
+        friend = userDao.add(friend);
 
         userDao.addFriend(user.getId(), friend.getId());
         List<User> firstUserFriends = userDao.getFriends(user.getId()).get();
@@ -117,7 +117,7 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test2")
                 .build();
-        friend = userDao.addUser(friend);
+        friend = userDao.add(friend);
 
         userDao.addFriend(user.getId(), friend.getId());
         userDao.addFriend(user.getId(), friend.getId());
@@ -133,7 +133,7 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test2")
                 .build();
-        friend = userDao.addUser(friend);
+        friend = userDao.add(friend);
 
         userDao.addFriend(user.getId(), friend.getId());
         userDao.deleteFriend(user.getId(), friend.getId());
@@ -149,7 +149,7 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test3")
                 .build();
-        newUser = userDao.addUser(newUser);
+        newUser = userDao.add(newUser);
 
         User friend = User.builder()
                 .name("friend")
@@ -157,7 +157,7 @@ class UserDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test2")
                 .build();
-        friend = userDao.addUser(friend);
+        friend = userDao.add(friend);
 
         userDao.addFriend(user.getId(), friend.getId());
         userDao.addFriend(newUser.getId(), friend.getId());

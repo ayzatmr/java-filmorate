@@ -18,22 +18,22 @@ public class UserController {
 
     @GetMapping
     public List<User> findAllUsers() {
-        return userService.findAllUsers();
+        return userService.getAll();
     }
 
     @GetMapping("/{userId}")
     public User getUser(@PathVariable int userId) {
-        return userService.getUser(userId);
+        return userService.get(userId);
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        return userService.addUser(user);
+        return userService.add(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        return userService.updateUser(user);
+        return userService.update(user);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
-    List<User> findAllUsers();
+    List<User> getAll();
 
-    Optional<User> getUser(int userId);
+    Optional<User> get(int userId);
 
-    User addUser(User user);
+    User add(User user);
 
-    Optional<User> updateUser(User user);
+    Optional<User> update(User user);
 
     Optional<User> addFriend(int userId, int friendId);
 

@@ -36,14 +36,14 @@ class RatingDAOTest {
 
     @Test
     public void testGetRatingById() {
-        Rating rating = ratingDao.getRating(1).get();
+        Rating rating = ratingDao.get(1).get();
         assertEquals(1, rating.getId());
         assertEquals("G", rating.getName());
     }
 
     @Test
     public void testGetAllRatings() {
-        LinkedHashSet<Rating> ratings = ratingDao.getAllRatings();
+        LinkedHashSet<Rating> ratings = ratingDao.getAll();
         MatcherAssert.assertThat(ratings, Matchers.hasItems(
                 hasProperty("id", equalTo(1)),
                 hasProperty("name", equalTo("G"))

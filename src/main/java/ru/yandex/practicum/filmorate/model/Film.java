@@ -34,7 +34,7 @@ public class Film {
     @Builder.Default
     private Set<Integer> likedUsers = new HashSet<>();
 
-    private List<Genre> genres;
+    private LinkedHashSet<Genre> genres;
 
     @NotNull(message = "rating can not be null")
     private Rating mpa;

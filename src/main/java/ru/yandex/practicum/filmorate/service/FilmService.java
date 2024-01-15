@@ -10,11 +10,9 @@ import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -33,39 +31,37 @@ public class FilmService {
         this.genreDao = genreDao;
     }
 
-    public List<Film> findAllFilms() {
-        return filmDao.findAllFilms();
+    public List<Film> getAll() {
+        return filmDao.getAll();
     }
 
     public Film getFilm(int filmId) {
-        return filmDao.getFilm(filmId)
+        return filmDao.get(filmId)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 
     @Transactional
-    public Film addFilm(Film film) {
+    public Film add(Film film) {
         checkFilmMaxDate(film);
-        Film updatedFilm = leftUniqueGenres(film);
-        log.debug("add new film: {}", updatedFilm);
-        Film addedFilm = filmDao.addFilm(updatedFilm);
-        updatedFilm.setId(addedFilm.getId());
-        return genreDao.addFilmGenre(updatedFilm);
+        log.debug("add new film: {}", film);
+        Film addedFilm = filmDao.add(film);
+        film.setId(addedFilm.getId());
+        return genreDao.addFilmGenre(film);
     }
 
     @Transactional
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         checkFilmMaxDate(film);
-        Film updatedFilm = leftUniqueGenres(film);
-        log.debug("update film: {}", updatedFilm);
-        filmDao.updateFilm(updatedFilm)
+        log.debug("update film: {}", film);
+        filmDao.update(film)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
-        genreDao.deleteFilmGenre(updatedFilm);
-        return genreDao.addFilmGenre(updatedFilm);
+        genreDao.deleteFilmGenre(film);
+        return genreDao.addFilmGenre(film);
     }
 
     public Film addLike(int filmId, int userId) {
         log.debug("add like by userId = {} to film with id = {}", userId, filmId);
-        if (userDao.getUser(userId).isEmpty()) {
+        if (userDao.get(userId).isEmpty()) {
             throw new ObjectNotFoundException("User not found");
         }
         return filmDao.addLike(filmId, userId)
@@ -74,7 +70,7 @@ public class FilmService {
 
     public void deleteLike(int filmId, int userId) {
         log.debug("delete like by userId = {} from film with id = {}", userId, filmId);
-        if (userDao.getUser(userId).isEmpty()) {
+        if (userDao.get(userId).isEmpty()) {
             throw new ObjectNotFoundException("User not found");
         }
         filmDao.deleteLike(filmId, userId)
@@ -84,17 +80,6 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         log.debug("Get popular films with limit = {}", count);
         return filmDao.getPopularFilms(count);
-    }
-
-    private Film leftUniqueGenres(Film film) {
-        if (film.getGenres() != null) {
-            List<Genre> genres = film.getGenres()
-                    .stream()
-                    .distinct()
-                    .collect(Collectors.toList());
-            film.setGenres(genres);
-        }
-        return film;
     }
 
     private void checkFilmMaxDate(Film film) {

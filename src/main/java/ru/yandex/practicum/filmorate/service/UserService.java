@@ -20,31 +20,25 @@ public class UserService {
         this.userDao = userDao;
     }
 
-    public List<User> findAllUsers() {
-        return userDao.findAllUsers();
+    public List<User> getAll() {
+        return userDao.getAll();
     }
 
-    private void checkUserName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
-    public User getUser(int userId) {
-        return userDao.getUser(userId)
+    public User get(int userId) {
+        return userDao.get(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
-    public User addUser(User user) {
+    public User add(User user) {
         checkUserName(user);
         log.debug("add new user: {}", user);
-        return userDao.addUser(user);
+        return userDao.add(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
         checkUserName(user);
         log.debug("update user: {}", user);
-        return userDao.updateUser(user)
+        return userDao.update(user)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
     }
 
@@ -72,5 +66,11 @@ public class UserService {
         }
         return userDao.getCommonFriends(userId, otherId)
                 .orElseThrow(() -> new ObjectNotFoundException("User not found"));
+    }
+
+    private void checkUserName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }

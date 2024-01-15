@@ -7,9 +7,9 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 public interface GenreDao {
-    Optional<Genre> getGenre(int genreId);
+    Optional<Genre> get(int genreId);
 
-    LinkedHashSet<Genre> getAllGenres();
+    LinkedHashSet<Genre> getAll();
 
     Film addFilmGenre(Film film);
 

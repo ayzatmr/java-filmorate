@@ -24,11 +24,11 @@ public class InMemoryGenreDaoImpl implements GenreDao {
             new AbstractMap.SimpleEntry<>(6, new Genre(6, "Боевик"))
     );
 
-    public Optional<Genre> getGenre(int genreId) {
+    public Optional<Genre> get(int genreId) {
         return Optional.ofNullable(genres.get(genreId));
     }
 
-    public LinkedHashSet<Genre> getAllGenres() {
+    public LinkedHashSet<Genre> getAll() {
         return new LinkedHashSet<>(genres.values());
     }
 

@@ -47,14 +47,14 @@ class GenreDAOTest {
 
     @Test
     public void testGetGenreById() {
-        Genre genre = genreDao.getGenre(1).get();
+        Genre genre = genreDao.get(1).get();
         assertEquals(1, genre.getId());
         assertEquals("Комедия", genre.getName());
     }
 
     @Test
     public void testGetAllGenres() {
-        LinkedHashSet<Genre> genres = genreDao.getAllGenres();
+        LinkedHashSet<Genre> genres = genreDao.getAll();
         assertThat(genres, Matchers.hasItems(
                 hasProperty("id", equalTo(1)),
                 hasProperty("name", equalTo("Комедия"))
@@ -63,7 +63,7 @@ class GenreDAOTest {
 
     @Test
     public void createFilmWithGenre() {
-        List<Genre> genres = List.of(new Genre(1, "Комедия"));
+        LinkedHashSet<Genre> genres = new LinkedHashSet<>(List.of(new Genre(1, "Комедия")));
         Film newFilm = Film.builder()
                 .name("James Bond")
                 .description("Good film")
@@ -71,7 +71,7 @@ class GenreDAOTest {
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
                 .build();
-        Film createdFilm = filmDao.addFilm(newFilm);
+        Film createdFilm = filmDao.add(newFilm);
 
         newFilm = newFilm.toBuilder()
                 .id(createdFilm.getId())
@@ -87,7 +87,9 @@ class GenreDAOTest {
 
     @Test
     public void createFilmWithTwoGenres() {
-        List<Genre> genres = List.of(new Genre(1, "Комедия"), new Genre(2, "Драма"));
+        LinkedHashSet<Genre> genres = new LinkedHashSet<>(List.of(
+                new Genre(1, "Комедия"),
+                new Genre(2, "Драма")));
         Film newFilm = Film.builder()
                 .name("James Bond")
                 .description("Good film")
@@ -95,7 +97,7 @@ class GenreDAOTest {
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
                 .build();
-        Film createdFilm = filmDao.addFilm(newFilm);
+        Film createdFilm = filmDao.add(newFilm);
 
         newFilm = newFilm.toBuilder()
                 .id(createdFilm.getId())
@@ -111,7 +113,7 @@ class GenreDAOTest {
 
     @Test
     public void deleteFilmGenre() {
-        List<Genre> genres = List.of(new Genre(1, "Комедия"));
+        LinkedHashSet<Genre> genres = new LinkedHashSet<>(List.of(new Genre(1, "Комедия")));
         Film newFilm = Film.builder()
                 .name("James Bond")
                 .description("Good film")
@@ -119,7 +121,7 @@ class GenreDAOTest {
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
                 .build();
-        Film createdFilm = filmDao.addFilm(newFilm);
+        Film createdFilm = filmDao.add(newFilm);
 
         newFilm = newFilm.toBuilder()
                 .id(createdFilm.getId())
@@ -127,7 +129,7 @@ class GenreDAOTest {
                 .build();
         createdFilm = genreDao.addFilmGenre(newFilm);
         genreDao.deleteFilmGenre(createdFilm);
-        Film savedFilm = filmDao.getFilm(createdFilm.getId()).get();
+        Film savedFilm = filmDao.get(createdFilm.getId()).get();
         assertEquals(0, savedFilm.getGenres().size());
     }
 }

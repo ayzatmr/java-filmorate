@@ -19,14 +19,14 @@ public class GenreService {
         this.genreDao = genreDao;
     }
 
-    public LinkedHashSet<Genre> getAllGenres() {
+    public LinkedHashSet<Genre> getAll() {
         log.debug("get all available genres");
-        return genreDao.getAllGenres();
+        return genreDao.getAll();
     }
 
-    public Genre getGenreById(int genreId) {
+    public Genre get(int genreId) {
         log.debug("get genre with id = {}", genreId);
-        return genreDao.getGenre(genreId)
+        return genreDao.get(genreId)
                 .orElseThrow(() -> new ObjectNotFoundException("Genre is not found"));
     }
 }

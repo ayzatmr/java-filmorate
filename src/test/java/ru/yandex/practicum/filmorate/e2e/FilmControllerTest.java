@@ -75,7 +75,7 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test5")
                 .build();
-        userService.addUser(user);
+        userService.add(user);
     }
 
     @Test
@@ -86,7 +86,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -108,7 +108,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -134,7 +134,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(1800, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -199,7 +199,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(1800, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -221,7 +221,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -242,7 +242,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -286,7 +286,7 @@ public class FilmControllerTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -323,7 +323,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .likedUsers(Collections.singleton(1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
         String json = objectMapper.writeValueAsString(film);
 
@@ -366,7 +366,7 @@ public class FilmControllerTest {
                     .releaseDate(LocalDate.of(2000, 1, 1))
                     .likedUsers(getRandomSet(i))
                     .mpa(new Rating(1, "G"))
-                    .genres(List.of(new Genre(1, "Комедия")))
+                    .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                     .build();
             String json = objectMapper.writeValueAsString(film);
 
@@ -415,7 +415,7 @@ public class FilmControllerTest {
                     .duration(2)
                     .releaseDate(LocalDate.of(2000, 1, 1))
                     .mpa(new Rating(1, "G"))
-                    .genres(List.of(new Genre(1, "Комедия")))
+                    .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                     .build();
             String json = objectMapper.writeValueAsString(film);
 

@@ -21,9 +21,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasProperty;
@@ -57,7 +55,7 @@ class FilmDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test")
                 .build();
-        user = userDao.addUser(newUser);
+        user = userDao.add(newUser);
     }
 
     @BeforeEach
@@ -68,14 +66,14 @@ class FilmDAOTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
-        film = filmDao.addFilm(newFilm);
+        film = filmDao.add(newFilm);
     }
 
     @Test
     public void testFindFilmById() {
-        Film savedFilm = filmDao.getFilm(film.getId()).get();
+        Film savedFilm = filmDao.get(film.getId()).get();
         assertThat(savedFilm)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -84,7 +82,7 @@ class FilmDAOTest {
 
     @Test
     public void testGetAllFilms() {
-        List<Film> allFilms = filmDao.findAllFilms();
+        List<Film> allFilms = filmDao.getAll();
 
         MatcherAssert.assertThat(allFilms, Matchers.hasItems(
                 hasProperty("name", is(film.getName())),
@@ -106,11 +104,11 @@ class FilmDAOTest {
                 .duration(12)
                 .releaseDate(LocalDate.of(1999, 1, 1))
                 .mpa(new Rating(2, "PG"))
-                .genres(new ArrayList<>())
+                .genres(new LinkedHashSet<>())
                 .build();
-        newFilm = filmDao.updateFilm(newFilm).get();
+        newFilm = filmDao.update(newFilm).get();
 
-        Film filmById = filmDao.getFilm(newFilm.getId()).get();
+        Film filmById = filmDao.get(newFilm.getId()).get();
         assertThat(filmById)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -138,9 +136,9 @@ class FilmDAOTest {
                 .duration(2)
                 .releaseDate(LocalDate.of(2000, 1, 1))
                 .mpa(new Rating(1, "G"))
-                .genres(List.of(new Genre(1, "Комедия")))
+                .genres(new LinkedHashSet<>(List.of(new Genre(1, "Комедия"))))
                 .build();
-        newFilm = filmDao.addFilm(newFilm);
+        newFilm = filmDao.add(newFilm);
 
         User user2 = User.builder()
                 .name("Rayan Buc")
@@ -148,7 +146,7 @@ class FilmDAOTest {
                 .birthday(LocalDate.of(1991, 11, 11))
                 .login("test2")
                 .build();
-        user2 = userDao.addUser(user2);
+        user2 = userDao.add(user2);
 
         filmDao.addLike(film.getId(), user.getId());
         filmDao.addLike(film.getId(), user2.getId());

@@ -19,14 +19,14 @@ public class RatingService {
         this.ratingDao = ratingDao;
     }
 
-    public LinkedHashSet<Rating> getAllRatings() {
+    public LinkedHashSet<Rating> getAll() {
         log.debug("get all available ratings");
-        return ratingDao.getAllRatings();
+        return ratingDao.getAll();
     }
 
-    public Rating getRatingById(int ratingId) {
+    public Rating get(int ratingId) {
         log.debug("get rating with id = {}", ratingId);
-        return ratingDao.getRating(ratingId)
+        return ratingDao.get(ratingId)
                 .orElseThrow(() -> new ObjectNotFoundException("Rating is not found"));
     }
 }

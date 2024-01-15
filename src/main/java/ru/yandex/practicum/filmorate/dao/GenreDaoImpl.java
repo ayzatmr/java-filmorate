@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
@@ -23,18 +24,18 @@ public class GenreDaoImpl implements GenreDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Optional<Genre> getGenre(int genreId) {
+    public Optional<Genre> get(int genreId) {
         String sqlQuery = "select * from GENRES where id = ?;";
         try {
             Genre genre = jdbcTemplate.queryForObject(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class), genreId);
-            return Optional.ofNullable(genre);
+            return Optional.of(genre);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public LinkedHashSet<Genre> getAllGenres() {
+    public LinkedHashSet<Genre> getAll() {
         String sqlQuery = "select * from GENRES order by ID";
         return new LinkedHashSet<>(jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Genre.class)));
     }
@@ -47,7 +48,7 @@ public class GenreDaoImpl implements GenreDao {
                     new BatchPreparedStatementSetter() {
                         public void setValues(PreparedStatement ps, int i) throws SQLException {
                             ps.setInt(1, film.getId());
-                            ps.setInt(2, film.getGenres().get(i).getId());
+                            ps.setInt(2, new ArrayList<>(film.getGenres()).get(i).getId());
                         }
 
                         public int getBatchSize() {

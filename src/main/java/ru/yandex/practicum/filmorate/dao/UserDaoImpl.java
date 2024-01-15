@@ -30,24 +30,24 @@ public class UserDaoImpl implements UserDao {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public List<User> findAllUsers() {
+    public List<User> getAll() {
         String sqlQuery = "select * from USERS;";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
-    public Optional<User> getUser(int userId) {
+    public Optional<User> get(int userId) {
         String sqlQuery = "select * from USERS where id = ?;";
         try {
             User user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, userId);
-            return Optional.ofNullable(user);
+            return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public User addUser(User user) {
+    public User add(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -57,8 +57,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> updateUser(User user) {
-        Optional<User> currentUser = getUser(user.getId());
+    public Optional<User> update(User user) {
+        Optional<User> currentUser = get(user.getId());
         if (currentUser.isEmpty()) {
             return Optional.empty();
         }
@@ -74,8 +74,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> addFriend(int userId, int friendId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(friendId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(friendId);
         if (currentUser.isPresent() && friend.isPresent()) {
             SqlRowSet isFriends = jdbcTemplate.queryForRowSet(
                     "select * from friends where user_id = ? and friend_id = ?", userId, friendId);
@@ -96,8 +96,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteFriend(int userId, int friendId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(friendId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(friendId);
         if (currentUser.isPresent() && friend.isPresent()) {
             String sqlQuery = "delete from friends where user_id = ? and friend_id = ?";
             jdbcTemplate.update(sqlQuery, userId, friendId);
@@ -106,7 +106,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<List<User>> getFriends(int userId) {
-        if (getUser(userId).isEmpty()) {
+        if (get(userId).isEmpty()) {
             return Optional.empty();
         }
         String sqlQuery = "select * from USERS where id in (select FRIEND_ID from FRIENDS where USER_ID = ?);";
@@ -116,8 +116,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<List<User>> getCommonFriends(int userId, int otherId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(otherId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(otherId);
         if (currentUser.isPresent() && friend.isPresent()) {
             String sqlQuery = "select * from USERS where id in (select FRIEND_ID from FRIENDS where USER_ID = ? and FRIEND_ID in (select FRIEND_ID from FRIENDS where USER_ID = ?));";
             List<User> friends = jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId, otherId);

@@ -25,25 +25,25 @@ public class InMemoryFilmDaoImpl implements FilmDao {
     );
 
     @Override
-    public List<Film> findAllFilms() {
+    public List<Film> getAll() {
         return new ArrayList<>(films.values());
     }
 
     @Override
-    public Optional<Film> getFilm(int filmId) {
+    public Optional<Film> get(int filmId) {
         return Optional.ofNullable(films.get(filmId));
     }
 
     @Override
-    public Film addFilm(Film film) {
+    public Film add(Film film) {
         film.setId(uniqueId.incrementAndGet());
         films.put(film.getId(), film);
         return film;
     }
 
     @Override
-    public Optional<Film> updateFilm(Film film) {
-        Optional<Film> currentFilm = getFilm(film.getId());
+    public Optional<Film> update(Film film) {
+        Optional<Film> currentFilm = get(film.getId());
         if (currentFilm.isPresent()) {
             films.put(film.getId(), film);
             return Optional.of(film);
@@ -53,14 +53,14 @@ public class InMemoryFilmDaoImpl implements FilmDao {
 
     @Override
     public Optional<Film> addLike(int filmId, int userId) {
-        Optional<Film> film = getFilm(filmId);
+        Optional<Film> film = get(filmId);
         film.ifPresent(f -> f.getLikedUsers().add(userId));
         return film;
     }
 
     @Override
     public Optional<Film> deleteLike(int filmId, int userId) {
-        Optional<Film> film = getFilm(filmId);
+        Optional<Film> film = get(filmId);
         film.ifPresent(f -> f.getLikedUsers().remove(userId));
         return film;
     }

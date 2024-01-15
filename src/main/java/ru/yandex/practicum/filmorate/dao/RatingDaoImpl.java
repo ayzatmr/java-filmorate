@@ -20,18 +20,18 @@ public class RatingDaoImpl implements RatingDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Optional<Rating> getRating(int ratingId) {
+    public Optional<Rating> get(int ratingId) {
         String sqlQuery = "select * from RATINGS where id = ?;";
         try {
             Rating rating = jdbcTemplate.queryForObject(sqlQuery, BeanPropertyRowMapper.newInstance(Rating.class), ratingId);
-            return Optional.ofNullable(rating);
+            return Optional.of(rating);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public LinkedHashSet<Rating> getAllRatings() {
+    public LinkedHashSet<Rating> getAll() {
         String sqlQuery = "select * from RATINGS order by ID";
         return new LinkedHashSet<>(jdbcTemplate.query(sqlQuery, BeanPropertyRowMapper.newInstance(Rating.class)));
     }

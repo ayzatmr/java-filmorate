@@ -21,7 +21,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> findAllFilms() {
-        return filmService.findAllFilms();
+        return filmService.getAll();
     }
 
     @GetMapping("/{filmId}")
@@ -31,12 +31,12 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmService.addFilm(film);
+        return filmService.add(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+        return filmService.update(film);
     }
 
     @PutMapping("{filmId}/like/{userId}")

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface RatingDao {
 
-    Optional<Rating> getRating(int ratingId);
+    Optional<Rating> get(int ratingId);
 
-    LinkedHashSet<Rating> getAllRatings();
+    LinkedHashSet<Rating> getAll();
 }
