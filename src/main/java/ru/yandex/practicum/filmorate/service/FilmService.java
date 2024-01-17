@@ -1,74 +1,90 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.dao.interfaces.FilmDao;
+import ru.yandex.practicum.filmorate.dao.interfaces.GenreDao;
+import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final FilmDao filmDao;
+
+    private final UserDao userDao;
+
+    private final GenreDao genreDao;
 
     private static final LocalDate MAX_DATE = LocalDate.of(1895, 12, 12);
 
-    private void checkFilmMaxDate(Film film) {
-        if (film.getReleaseDate().isBefore(MAX_DATE)) {
-            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
-        }
+    public FilmService(@Qualifier("FilmDaoImpl") FilmDao filmDao, @Qualifier("UserDaoImpl") UserDao userDao, @Qualifier("GenreDaoImpl") GenreDao genreDao) {
+        this.filmDao = filmDao;
+        this.userDao = userDao;
+        this.genreDao = genreDao;
     }
 
-    public List<Film> findAllFilms() {
-        return filmStorage.findAllFilms();
+    public List<Film> getAll() {
+        return filmDao.getAll();
     }
 
     public Film getFilm(int filmId) {
-        return filmStorage.getFilm(filmId)
+        return filmDao.get(filmId)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
     }
 
-    public Film addFilm(Film film) {
+    @Transactional
+    public Film add(Film film) {
         checkFilmMaxDate(film);
         log.debug("add new film: {}", film);
-        return filmStorage.addFilm(film);
+        Film addedFilm = filmDao.add(film);
+        film.setId(addedFilm.getId());
+        return genreDao.addFilmGenre(film);
     }
 
-    public Film updateFilm(Film film) {
+    @Transactional
+    public Film update(Film film) {
         checkFilmMaxDate(film);
         log.debug("update film: {}", film);
-        return filmStorage.updateFilm(film)
+        filmDao.update(film)
                 .orElseThrow(() -> new ObjectNotFoundException("Film is not found"));
+        genreDao.deleteFilmGenre(film);
+        return genreDao.addFilmGenre(film);
     }
 
     public Film addLike(int filmId, int userId) {
         log.debug("add like by userId = {} to film with id = {}", userId, filmId);
-        if (userStorage.getUser(userId).isEmpty()) {
+        if (userDao.get(userId).isEmpty()) {
             throw new ObjectNotFoundException("User not found");
         }
-        return filmStorage.addLike(filmId, userId)
+        return filmDao.addLike(filmId, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Wrong film or userId is provided"));
     }
 
     public void deleteLike(int filmId, int userId) {
         log.debug("delete like by userId = {} from film with id = {}", userId, filmId);
-        if (userStorage.getUser(userId).isEmpty()) {
+        if (userDao.get(userId).isEmpty()) {
             throw new ObjectNotFoundException("User not found");
         }
-        filmStorage.deleteLike(filmId, userId)
+        filmDao.deleteLike(filmId, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Wrong film or userId is presented"));
     }
 
     public List<Film> getPopularFilms(int count) {
         log.debug("Get popular films with limit = {}", count);
-        return filmStorage.getPopularFilms(count);
+        return filmDao.getPopularFilms(count);
+    }
+
+    private void checkFilmMaxDate(Film film) {
+        if (film.getReleaseDate().isBefore(MAX_DATE)) {
+            throw new ValidationException("date can not be more than " + MAX_DATE.toString());
+        }
     }
 }

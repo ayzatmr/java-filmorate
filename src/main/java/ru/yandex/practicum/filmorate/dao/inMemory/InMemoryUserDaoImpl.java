@@ -1,6 +1,8 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao.inMemory;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dao.interfaces.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -8,30 +10,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
+@Qualifier("InMemoryUserDaoImpl")
+public class InMemoryUserDaoImpl implements UserDao {
     private final Map<Integer, User> users = new HashMap<>();
     private final AtomicInteger uniqueId = new AtomicInteger();
 
     @Override
-    public List<User> findAllUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public Optional<User> getUser(int userId) {
+    public Optional<User> get(int userId) {
         return Optional.ofNullable(users.get(userId));
     }
 
     @Override
-    public User addUser(User user) {
+    public User add(User user) {
         user.setId(uniqueId.incrementAndGet());
         users.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public Optional<User> updateUser(User user) {
-        Optional<User> currentUser = getUser(user.getId());
+    public Optional<User> update(User user) {
+        Optional<User> currentUser = get(user.getId());
         if (currentUser.isPresent()) {
             users.put(user.getId(), user);
             return Optional.of(user);
@@ -41,8 +44,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<User> addFriend(int userId, int friendId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(friendId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(friendId);
         if (currentUser.isPresent() && friend.isPresent()) {
             currentUser.get().getFriends().add(friendId);
             friend.get().getFriends().add(userId);
@@ -53,8 +56,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void deleteFriend(int userId, int friendId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(friendId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(friendId);
         if (currentUser.isPresent() && friend.isPresent()) {
             currentUser.get().getFriends().remove(friendId);
             friend.get().getFriends().remove(userId);
@@ -63,7 +66,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<List<User>> getFriends(int userId) {
-        Optional<User> currentUser = getUser(userId);
+        Optional<User> currentUser = get(userId);
         return currentUser.map(user -> user.getFriends()
                 .stream()
                 .map(users::get)
@@ -72,8 +75,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public Optional<List<User>> getCommonFriends(int userId, int otherId) {
-        Optional<User> currentUser = getUser(userId);
-        Optional<User> friend = getUser(otherId);
+        Optional<User> currentUser = get(userId);
+        Optional<User> friend = get(otherId);
         if (currentUser.isPresent() && friend.isPresent()) {
             return currentUser.map(user -> user.getFriends()
                     .stream()

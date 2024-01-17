@@ -1,16 +1,16 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao.interfaces;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface FilmStorage {
-    List<Film> findAllFilms();
+public interface FilmDao {
+    List<Film> getAll();
 
-    Film addFilm(Film film);
+    Film add(Film film);
 
-    Optional<Film> updateFilm(Film film);
+    Optional<Film> update(Film film);
 
     Optional<Film> addLike(int filmId, int userId);
 
@@ -18,5 +18,5 @@ public interface FilmStorage {
 
     List<Film> getPopularFilms(int count);
 
-    Optional<Film> getFilm(int filmId);
+    Optional<Film> get(int filmId);
 }

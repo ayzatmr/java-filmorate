@@ -1,18 +1,18 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao.interfaces;
 
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserStorage {
-    List<User> findAllUsers();
+public interface UserDao {
+    List<User> getAll();
 
-    Optional<User> getUser(int userId);
+    Optional<User> get(int userId);
 
-    User addUser(User user);
+    User add(User user);
 
-    Optional<User> updateUser(User user);
+    Optional<User> update(User user);
 
     Optional<User> addFriend(int userId, int friendId);
 
